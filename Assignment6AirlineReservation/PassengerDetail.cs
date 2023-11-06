@@ -4,34 +4,34 @@ using System.Reflection;
 namespace Assignment6AirlineReservation
 {
     /// <summary>
-    /// The details of a given passenger
+    /// The details of a given passengers
     /// </summary>
     class PassengerDetail
     {
         /// <summary>
-        /// The id of the passenger from the database
+        /// The id of the passengers from the database
         /// </summary>
         private int id;
         /// <summary>
-        /// The first name of the passenger
+        /// The first name of the passengers
         /// </summary>
         private readonly string firstName;
         /// <summary>
-        /// The last name of the passenger
+        /// The last name of the passengers
         /// </summary>
         private readonly string lastName;
         /// <summary>
-        /// If the passenger has a seat or not and what the seat number is
+        /// If the passengers has a seat or not and what the seat number is
         /// </summary>
-        private readonly int? seatNumber;
+        private int? seatNumber;
 
         /// <summary>
         /// A generic constructor that takes all parameters and defines them directly
         /// </summary>
         /// <param name="id">A unique identifier</param>
-        /// <param name="firstName">The first name of the passenger</param>
-        /// <param name="lastName">The last name of the passenger</param>
-        /// <param name="seatNumber">Optionally the seat number of the passenger</param>
+        /// <param name="firstName">The first name of the passengers</param>
+        /// <param name="lastName">The last name of the passengers</param>
+        /// <param name="seatNumber">Optionally the seat number of the passengers</param>
         /// <exception cref="Exception"></exception>
         public PassengerDetail(int id, string firstName, string lastName, int? seatNumber = null)
         {
@@ -50,7 +50,7 @@ namespace Assignment6AirlineReservation
             }
         }
         /// <summary>
-        /// Returns the seat number of the passenger
+        /// Returns the seat number of the passengers
         /// </summary>
         public int? SeatNumber
         {
@@ -65,6 +65,14 @@ namespace Assignment6AirlineReservation
                     throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
 
                 }
+            }
+            set { seatNumber = value; }
+        }
+        public int Id
+        {
+            get
+            {
+                return id;
             }
         }
 

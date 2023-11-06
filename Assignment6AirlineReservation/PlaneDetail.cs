@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Assignment6AirlineReservation
@@ -24,7 +25,7 @@ namespace Assignment6AirlineReservation
         /// <summary>
         /// The details of the passengers on the plane type passengerDetail
         /// </summary>
-        private List<PassengerDetail> passenger = new List<PassengerDetail>();
+        private BindingList<PassengerDetail> passengers = new BindingList<PassengerDetail>();
         /// <summary>
         /// 
         /// </summary>
@@ -63,16 +64,16 @@ namespace Assignment6AirlineReservation
             }
         }
 
-        public List<PassengerDetail> Passengers
+        public BindingList<PassengerDetail> Passengers
         {
             get
             {
-                return passenger;
+                return passengers;
             }
         }
 
         /// <summary>
-        /// Adds the passenger from the passenger data and adds them to the flight
+        /// Adds the passengers from the passengers data and adds them to the flight
         /// </summary>
         /// <param name="passengerDetail"></param>
         /// <returns></returns>
@@ -81,7 +82,7 @@ namespace Assignment6AirlineReservation
         {
             try
             {
-                passenger.Add(passengerDetail);
+                passengers.Add(passengerDetail);
                 return true;
             }
             catch (Exception ex)
@@ -91,7 +92,7 @@ namespace Assignment6AirlineReservation
             }
         }
         /// <summary>
-        /// Gets the flight number and name overrides tostring method
+        /// Gets the flight number and name overrides ToString method
         /// </summary>
         /// <returns>flightNumber - name</returns>
         /// <exception cref="Exception"></exception>
@@ -126,18 +127,19 @@ namespace Assignment6AirlineReservation
 
             }
         }
-        /// <summary>
-        /// Returns the list of passengers
-        /// </summary>
-        /// <returns>A list of passengers run tostring to get names</returns>
-        /// <exception cref="Exception"></exception>
-        public List<PassengerDetail> getPassengerName()
+       
+        public PassengerDetail getPassenger(string seatNumber)
         {
 
             try
             {
-
-                return passenger;
+                foreach(PassengerDetail passenger in passengers){
+                    if(passenger.SeatNumber.ToString() == seatNumber)
+                    {
+                        return passenger;
+                    }
+                }
+                return null;
             }
             catch (Exception ex)
             {
@@ -147,9 +149,9 @@ namespace Assignment6AirlineReservation
         }
         
         /// <summary>
-        /// Get the seat number of the passenger based on name
+        /// Get the seat number of the passengers based on name
         /// </summary>
-        /// <param name="passengerName">The name of the given passenger</param>
+        /// <param name="passengerName">The name of the given passengers</param>
         /// <returns>The respective seat number as int else null</returns>
         /// <exception cref="Exception"></exception>
         public int? getSeatNumber(string passengerName)
@@ -157,7 +159,7 @@ namespace Assignment6AirlineReservation
 
             try
             {
-                foreach (PassengerDetail passenger in passenger)
+                foreach (PassengerDetail passenger in passengers)
                 {
                     if (passenger.ToString() == passengerName)
                     {
@@ -173,35 +175,6 @@ namespace Assignment6AirlineReservation
 
             }
         }
-        /// <summary>
-        /// Taken a seat number as string and returns whether someone is sitting there as red or blue
-        /// </summary>
-        /// <param name="seat">the content of the seat 1,2,3</param>
-        /// <returns>red or blue depending on if taken</returns>
-        /// <exception cref="Exception"></exception>
-        public string getSeatColor(string seat)
-        {
-
-            try
-            {
-                bool res = int.TryParse(seat, out int seatNum);
-                foreach (PassengerDetail passenger in passenger)
-                {
-                    if (passenger.SeatNumber == seatNum)
-                    {
-                        return "red";
-                    }
-
-                }
-
-                return "blue";
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
-
-            }
-        }
-
+        
     }
 }

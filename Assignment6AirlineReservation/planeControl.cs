@@ -1,6 +1,7 @@
 ﻿using Assignment6AirlineReservation;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Reflection;
 
@@ -16,8 +17,14 @@ namespace Assignment6AirlineReservation
         /// <summary>
         /// The list of planes as a PlaneDetail
         /// </summary>
-        private static List<PlaneDetail> planes = new List<PlaneDetail>();
-        
+        private static BindingList<PlaneDetail> planes = new BindingList<PlaneDetail>();
+
+        private static PassengerDetail newPassenger;
+
+        public static PassengerDetail NewPassenger
+        {
+            get { return newPassenger; }
+        }
 
         /// <summary>
         /// Adds the sql info to the planes list and adds all the passengers to the list.
@@ -67,7 +74,7 @@ namespace Assignment6AirlineReservation
         }
 
 
-        public static List<PlaneDetail> Planes
+        public static BindingList<PlaneDetail> Planes
         {
             get
             {
@@ -75,6 +82,22 @@ namespace Assignment6AirlineReservation
             }
         }
 
-        
+        public static void addPassenger(string FirstName, string LastName)
+        {
+            string sSQL = $"INSERT INTO PASSENGER(First_Name, Last_Name) VALUES('{FirstName}','{LastName}')";
+            clsDataAccess.ExecuteNonQuery(sSQL);
+            sSQL = $"SELECT Passenger_ID from Passenger where First_Name = '{FirstName}' AND Last_Name = '{LastName}'";
+            string id = clsDataAccess.ExecuteScalarSQL(sSQL);
+            bool res = int.TryParse(id, out int passengerId);
+            newPassenger = new PassengerDetail(passengerId, FirstName, LastName);
+        }
+
+        public static void addFlightPassenger(int flightId)
+        {
+            string sSQL = "INSERT INTO Flight_Passenger_Link(Flight_ID, Passenger_ID, Seat_Number) " +
+       $"VALUES( {flightId} , {newPassenger.Id} , {newPassenger.SeatNumber})";
+            clsDataAccess.ExecuteNonQuery(sSQL);
+            newPassenger = null;
+        }
     }
 }

@@ -20,8 +20,9 @@ namespace Assignment6AirlineReservation
     /// </summary>
     public partial class wndAddPassenger : Window
     {
+
         /// <summary>
-        /// constructor for the add passenger window
+        /// constructor for the add passengers window
         /// </summary>
         public wndAddPassenger()
         {
@@ -82,6 +83,7 @@ namespace Assignment6AirlineReservation
 
         private void cmdSave_Click(object sender, RoutedEventArgs e)
         {
+           planeControl.addPassenger(txtFirstName.Text, txtLastName.Text);
             this.Close();
         }
     }
