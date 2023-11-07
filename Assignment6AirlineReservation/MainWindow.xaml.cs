@@ -207,7 +207,7 @@ namespace Assignment6AirlineReservation
             {
                 selectedPassenger.SeatNumber = null;
                 lblPassengersSeatNumber.Content = " ";
-
+                setSeatColors();
                 cbChoosePassenger.IsEnabled = false;
                 cbChooseFlight.IsEnabled = false;
                 editPassenger = true;
