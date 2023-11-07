@@ -15,7 +15,8 @@ namespace Assignment6AirlineReservation
     {
         wndAddPassenger wndAddPass;
         PlaneDetail selectedPlane;
-        bool newPassenger;
+        PassengerDetail selectedPassenger;
+        bool editPassenger;
 
         public MainWindow()
         {
@@ -72,29 +73,7 @@ namespace Assignment6AirlineReservation
 
 
 
-        private void cmdAddPassenger_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                wndAddPass = new wndAddPassenger();
 
-                wndAddPass.ShowDialog();
-                if (planeControl.NewPassenger != null)
-                {
-                    selectedPlane.addPassenger(planeControl.NewPassenger);
-                    newPassenger = true;
-                    cbChoosePassenger.SelectedValue = planeControl.NewPassenger;
-                    cbChoosePassenger.IsEnabled = false;
-                    cbChooseFlight.IsEnabled = false;
-
-                }
-            }
-            catch (Exception ex)
-            {
-                HandleError(MethodInfo.GetCurrentMethod().DeclaringType.Name,
-                    MethodInfo.GetCurrentMethod().Name, ex.Message);
-            }
-        }
 
 
 
@@ -115,8 +94,11 @@ namespace Assignment6AirlineReservation
                 }
                 foreach (Label control in selectedCanvas.Children)
                 {
-                   
-                    if (control.Content.ToString() != (lblPassengersSeatNumber.Content.ToString()))
+                    if (control.Content.ToString() == lblPassengersSeatNumber.Content.ToString())
+                    {
+                        control.Background = Brushes.LimeGreen;
+                    }
+                    else
                     {
                         foreach (PassengerDetail passenger in selectedPlane.Passengers)
                         {
@@ -134,10 +116,7 @@ namespace Assignment6AirlineReservation
                             }
                         }
                     }
-                    else
-                    {
-                        control.Background = Brushes.Green;
-                    }
+                   
                 }
             }
             catch (Exception ex)
@@ -146,6 +125,97 @@ namespace Assignment6AirlineReservation
 
             }
         }
+
+
+
+        private void seat_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Label labelSender = sender as Label;
+            string selectedNum = labelSender.Content.ToString();
+            lblPassengersSeatNumber.Content = selectedNum;
+            bool res = int.TryParse(selectedNum, out int num);
+            if (editPassenger)
+            {
+                if (selectedPlane.setSeatNumber(selectedPassenger, num))
+                {
+                    editPassenger = false;
+                    cbChoosePassenger.IsEnabled = true;
+                    cbChooseFlight.IsEnabled = true;
+                }
+            }
+            else
+            {
+                cbChoosePassenger.SelectedItem = selectedPlane.getPassenger(selectedNum);
+            }
+
+
+            setSeatColors();
+
+        }
+
+
+
+        private void cbChoosePassenger_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedPassenger = (PassengerDetail)cbChoosePassenger.SelectedItem;
+
+            if (selectedPassenger != null)
+            {
+
+                if (selectedPassenger.SeatNumber != null)
+                {
+                    lblPassengersSeatNumber.Content = selectedPassenger.SeatNumber;
+                }
+                else
+                {
+                    lblPassengersSeatNumber.Content = " ";
+                }
+                setSeatColors();
+            }
+
+
+        }
+        private void cmdAddPassenger_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                wndAddPass = new wndAddPassenger();
+
+                wndAddPass.ShowDialog();
+                cbChoosePassenger.SelectedValue = selectedPlane.addPassenger(wndAddPass.txtFirstName.Text, wndAddPass.txtLastName.Text);
+                editPassenger = true;
+                cbChoosePassenger.IsEnabled = false;
+                cbChooseFlight.IsEnabled = false;
+            }
+            catch (Exception ex)
+            {
+                HandleError(MethodInfo.GetCurrentMethod().DeclaringType.Name,
+                    MethodInfo.GetCurrentMethod().Name, ex.Message);
+            }
+        }
+        private void cmdDeletePassenger_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedPassenger != null)
+            {
+                selectedPlane.deletePassenger(selectedPassenger);
+            }
+        }
+
+        private void cmdChangeSeat_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedPassenger != null)
+            {
+                selectedPassenger.SeatNumber = null;
+                lblPassengersSeatNumber.Content = " ";
+
+                cbChoosePassenger.IsEnabled = false;
+                cbChooseFlight.IsEnabled = false;
+                editPassenger = true;
+            }
+        }
+
+
+
 
         private void HandleError(string sClass, string sMethod, string sMessage)
         {
@@ -157,57 +227,6 @@ namespace Assignment6AirlineReservation
             {
                 System.IO.File.AppendAllText(@"C:\Error.txt", Environment.NewLine + "HandleError Exception: " + ex.Message);
             }
-        }
-
-        private void seat_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Label label = sender as Label;
-            string selectedNum = label.Content.ToString();
-            bool res = int.TryParse(selectedNum, out int num);
-            if (newPassenger)
-            {
-                if (label.Background == Brushes.Blue)
-                {
-                    planeControl.NewPassenger.SeatNumber = num;
-                    planeControl.addFlightPassenger(selectedPlane.Id);
-                    //cbChoosePassenger.ItemsSource = selectedPlane.Passengers;
-                    newPassenger = false;
-                    cbChoosePassenger.IsEnabled = true;
-                    cbChooseFlight.IsEnabled = true;
-
-                }
-            }
-            else
-            {
-                cbChoosePassenger.SelectedItem = selectedPlane.getPassenger(selectedNum);
-            }
-
-            lblPassengersSeatNumber.Content = label.Content.ToString();
-
-            setSeatColors();
-
-        }
-
-
-
-        private void cbChoosePassenger_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _ = cbChoosePassenger.Items;
-            if (cbChoosePassenger.SelectedItem != null)
-            {
-
-                if (((PassengerDetail)cbChoosePassenger.SelectedItem).SeatNumber != null)
-                {
-                    lblPassengersSeatNumber.Content = ((PassengerDetail)cbChoosePassenger.SelectedItem).SeatNumber;
-                }
-                else
-                {
-                    lblPassengersSeatNumber.Content = " ";
-                }
-                setSeatColors();
-            }
-
-
         }
     }
 }

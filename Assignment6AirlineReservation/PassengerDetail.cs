@@ -9,7 +9,7 @@ namespace Assignment6AirlineReservation
     class PassengerDetail
     {
         /// <summary>
-        /// The id of the passengers from the database
+        /// The planeId of the passengers from the database
         /// </summary>
         private int id;
         /// <summary>

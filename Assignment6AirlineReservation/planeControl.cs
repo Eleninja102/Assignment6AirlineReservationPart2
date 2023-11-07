@@ -1,6 +1,4 @@
-﻿using Assignment6AirlineReservation;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Data;
 using System.Reflection;
@@ -82,22 +80,46 @@ namespace Assignment6AirlineReservation
             }
         }
 
-        public static void addPassenger(string FirstName, string LastName)
+        public static PassengerDetail addPassenger(string FirstName, string LastName)
         {
             string sSQL = $"INSERT INTO PASSENGER(First_Name, Last_Name) VALUES('{FirstName}','{LastName}')";
             clsDataAccess.ExecuteNonQuery(sSQL);
             sSQL = $"SELECT Passenger_ID from Passenger where First_Name = '{FirstName}' AND Last_Name = '{LastName}'";
             string id = clsDataAccess.ExecuteScalarSQL(sSQL);
             bool res = int.TryParse(id, out int passengerId);
-            newPassenger = new PassengerDetail(passengerId, FirstName, LastName);
+            return new PassengerDetail(passengerId, FirstName, LastName);
         }
 
-        public static void addFlightPassenger(int flightId)
+
+        public static void deletePassenger(int flightId, int passengerId)
         {
-            string sSQL = "INSERT INTO Flight_Passenger_Link(Flight_ID, Passenger_ID, Seat_Number) " +
-       $"VALUES( {flightId} , {newPassenger.Id} , {newPassenger.SeatNumber})";
+            deletePassengerLink(flightId, passengerId);
+
+            string sSQL = $"Delete FROM PASSENGER WHERE PASSENGER_ID = {passengerId}";
             clsDataAccess.ExecuteNonQuery(sSQL);
-            newPassenger = null;
+
+        }
+
+        public static void deletePassengerLink(int flightId, int passengerId)
+        {
+           string sSQL = "Delete FROM FLIGHT_PASSENGER_LINK " + $"WHERE FLIGHT_ID = {flightId} AND " + $"PASSENGER_ID = {passengerId}";
+
+            clsDataAccess.ExecuteNonQuery(sSQL);
+        }
+
+        public static void changeSeatPassenger(int flightId, int seatNumber, int passengerId)
+        {
+            try { 
+                deletePassengerLink(flightId, passengerId);
+            }
+            finally
+            {
+
+                string sSQL = "INSERT INTO Flight_Passenger_Link(Flight_ID, Passenger_ID, Seat_Number) " +
+                $"VALUES( {flightId} , {passengerId} , {seatNumber})";
+                clsDataAccess.ExecuteNonQuery(sSQL);
+            }
+        
         }
     }
 }

@@ -11,9 +11,9 @@ namespace Assignment6AirlineReservation
     class PlaneDetail
     {
         /// <summary>
-        /// The id of the plane from the database
+        /// The planeId of the plane from the database
         /// </summary>
-        private int id;
+        private int planeId;
         /// <summary>
         /// The flight number from the database 
         /// </summary>
@@ -29,7 +29,7 @@ namespace Assignment6AirlineReservation
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="id">The unique id of the plane d</param>
+        /// <param name="id">The unique planeId of the plane d</param>
         /// <param name="flightNumber">The flight number as an int</param>
         /// <param name="name">The name of the plane</param>
         /// <exception cref="Exception"></exception>
@@ -38,7 +38,7 @@ namespace Assignment6AirlineReservation
 
             try
             {
-                this.id = id;
+                this.planeId = id;
                 this.flightNumber = flightNumber;
                 this.name = name;
             }
@@ -52,7 +52,7 @@ namespace Assignment6AirlineReservation
         public int Id{ 
             get 
             { 
-                return id;
+                return planeId;
             }
         }
 
@@ -69,6 +69,20 @@ namespace Assignment6AirlineReservation
             get
             {
                 return passengers;
+            }
+        }
+        public PassengerDetail addPassenger(string firstName, string lastName)
+        {
+            try
+            {
+                PassengerDetail x = planeControl.addPassenger(firstName, lastName);
+                passengers.Add(x);
+                return x;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+
             }
         }
 
@@ -174,6 +188,30 @@ namespace Assignment6AirlineReservation
                 throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
 
             }
+        }
+
+        public bool deletePassenger(PassengerDetail deletingPassenger)
+        {
+            passengers.Remove(deletingPassenger);
+            planeControl.deletePassenger(planeId, deletingPassenger.Id);
+            return true;
+        }
+
+
+        public bool setSeatNumber(PassengerDetail changePassenger, int number)
+        {
+            foreach(PassengerDetail passenger in passengers)
+            {
+                if(passenger.SeatNumber == number)
+                {
+                    return false;
+                }
+            }
+
+            changePassenger.SeatNumber = number;
+
+            planeControl.changeSeatPassenger(planeId, number, changePassenger.Id);
+            return true;
         }
         
     }
