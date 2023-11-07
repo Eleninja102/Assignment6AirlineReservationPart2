@@ -20,6 +20,30 @@ namespace Assignment6AirlineReservation
     /// </summary>
     public partial class wndAddPassenger : Window
     {
+        /// <summary>
+        /// Whether a newPassenger has been created or not
+        /// </summary>
+        private bool newPassenger = false;
+
+        /// <summary>
+        /// Returns whether a new passenger exist or not
+        /// </summary>
+        public bool NewPassenger
+        {
+            get
+            {
+                try
+                {
+                    return newPassenger;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// constructor for the add passengers window
@@ -81,10 +105,23 @@ namespace Assignment6AirlineReservation
             }
         }
 
+        /// <summary>
+        /// Closes the application on save and changes newPassenger to true
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmdSave_Click(object sender, RoutedEventArgs e)
         {
-           planeControl.addPassenger(txtFirstName.Text, txtLastName.Text);
-            this.Close();
+            try
+            {
+                newPassenger = true;
+                this.Close();
+            }
+            catch (System.Exception ex)
+            {
+                HandleError(MethodInfo.GetCurrentMethod().DeclaringType.Name,
+                            MethodInfo.GetCurrentMethod().Name, ex.Message);
+            }
         }
     }
 }

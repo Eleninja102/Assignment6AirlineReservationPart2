@@ -13,11 +13,26 @@ namespace Assignment6AirlineReservation
     /// </summary>
     public partial class MainWindow : Window
     {
-        wndAddPassenger wndAddPass;
-        PlaneDetail selectedPlane;
-        PassengerDetail selectedPassenger;
-        bool editPassenger;
+        /// <summary>
+        /// The Add passenger window object
+        /// </summary>
+        private wndAddPassenger wndAddPass;
+        /// <summary>
+        /// The plane the user has selected
+        /// </summary>
+        private PlaneDetail selectedPlane;
+        /// <summary>
+        /// The passenger the user has selected
+        /// </summary>
+        private PassengerDetail selectedPassenger;
+        /// <summary>
+        /// Whether a passenger is being edit (new seat or changing seat)
+        /// </summary>
+        private bool editPassenger;
 
+        /// <summary>
+        /// When window starts it loads database and sets the starting data and content
+        /// </summary>
         public MainWindow()
         {
             try
@@ -40,6 +55,11 @@ namespace Assignment6AirlineReservation
             }
         }
 
+        /// <summary>
+        /// When the flight is changed it enables the rest of the screen and loads the passenger items with the correct list.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cbChooseFlight_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -77,7 +97,10 @@ namespace Assignment6AirlineReservation
 
 
 
-
+        /// <summary>
+        /// Selects the canvas depending on the selected plane. Then it updates the colors of the seats
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         private void setSeatColors()
         {
 
@@ -116,7 +139,7 @@ namespace Assignment6AirlineReservation
                             }
                         }
                     }
-                   
+
                 }
             }
             catch (Exception ex)
@@ -127,65 +150,40 @@ namespace Assignment6AirlineReservation
         }
 
 
-
+        /// <summary>
+        /// When a label is selected from the canvas it checks if a passenger is being edited. If it is it sets the new seat number.
+        /// Otherwise it shows the passenger selected on the combo box or the null value
+        /// If it is null it has to run the setSeatColors to have them turn green
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void seat_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Label labelSender = sender as Label;
-            string selectedNum = labelSender.Content.ToString();
-            lblPassengersSeatNumber.Content = selectedNum;
-            bool res = int.TryParse(selectedNum, out int num);
-            if (editPassenger)
-            {
-                if (selectedPlane.setSeatNumber(selectedPassenger, num))
-                {
-                    editPassenger = false;
-                    cbChoosePassenger.IsEnabled = true;
-                    cbChooseFlight.IsEnabled = true;
-                }
-            }
-            else
-            {
-                cbChoosePassenger.SelectedItem = selectedPlane.getPassenger(selectedNum);
-            }
-
-
-            setSeatColors();
-
-        }
-
-
-
-        private void cbChoosePassenger_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            selectedPassenger = (PassengerDetail)cbChoosePassenger.SelectedItem;
-
-            if (selectedPassenger != null)
-            {
-
-                if (selectedPassenger.SeatNumber != null)
-                {
-                    lblPassengersSeatNumber.Content = selectedPassenger.SeatNumber;
-                }
-                else
-                {
-                    lblPassengersSeatNumber.Content = " ";
-                }
-                setSeatColors();
-            }
-
-
-        }
-        private void cmdAddPassenger_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                wndAddPass = new wndAddPassenger();
+                Label labelSender = sender as Label;
+                string selectedNum = labelSender.Content.ToString();
+                lblPassengersSeatNumber.Content = selectedNum;
+                bool res = int.TryParse(selectedNum, out int num);
+                if (editPassenger)
+                {
+                    if (selectedPlane.setSeatNumber(selectedPassenger, num))
+                    {
+                        cbChoosePassenger.IsEnabled = true;
+                        cbChooseFlight.IsEnabled = true;
+                    }
+                }
+                else
+                {
+                    cbChoosePassenger.SelectedItem = selectedPlane.getPassenger(selectedNum);
+                }
 
-                wndAddPass.ShowDialog();
-                cbChoosePassenger.SelectedValue = selectedPlane.addPassenger(wndAddPass.txtFirstName.Text, wndAddPass.txtLastName.Text);
-                editPassenger = true;
-                cbChoosePassenger.IsEnabled = false;
-                cbChooseFlight.IsEnabled = false;
+                if (selectedPassenger == null || editPassenger)
+                {
+                    setSeatColors();
+                }
+                editPassenger = false;
+
             }
             catch (Exception ex)
             {
@@ -193,30 +191,127 @@ namespace Assignment6AirlineReservation
                     MethodInfo.GetCurrentMethod().Name, ex.Message);
             }
         }
+
+
+        /// <summary>
+        /// When a passenger is selected from the combo-box or if it changes during seat selection.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cbChoosePassenger_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            try
+            {
+                selectedPassenger = (PassengerDetail)cbChoosePassenger.SelectedItem;
+
+                if (selectedPassenger != null)
+                {
+
+                    if (selectedPassenger.SeatNumber != null)
+                    {
+                        lblPassengersSeatNumber.Content = selectedPassenger.SeatNumber;
+
+                    }
+                    else
+                    {
+
+                        lblPassengersSeatNumber.Content = " ";
+                    }
+                    setSeatColors();
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError(MethodInfo.GetCurrentMethod().DeclaringType.Name,
+                    MethodInfo.GetCurrentMethod().Name, ex.Message);
+            }
+        }
+
+
+        /// <summary>
+        /// Opens the add passenger popup and as long as the user clicks save starts saving the passenger. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cmdAddPassenger_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                wndAddPass = new wndAddPassenger();
+
+                wndAddPass.ShowDialog();
+                if (wndAddPass.NewPassenger)
+                {
+                    cbChoosePassenger.SelectedValue = selectedPlane.addPassenger(wndAddPass.txtFirstName.Text, wndAddPass.txtLastName.Text);
+                    editPassenger = true;
+                    cbChoosePassenger.IsEnabled = false;
+                    cbChooseFlight.IsEnabled = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError(MethodInfo.GetCurrentMethod().DeclaringType.Name,
+                    MethodInfo.GetCurrentMethod().Name, ex.Message);
+            }
+        }
+        /// <summary>
+        /// When the delete passenger is selected as long as a passenger is also selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmdDeletePassenger_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedPassenger != null)
+
+            try
             {
-                selectedPlane.deletePassenger(selectedPassenger);
+                if (selectedPassenger != null)
+                {
+                    selectedPlane.deletePassenger(selectedPassenger);
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError(MethodInfo.GetCurrentMethod().DeclaringType.Name,
+                    MethodInfo.GetCurrentMethod().Name, ex.Message);
             }
         }
 
+        /// <summary>
+        /// When change seat is pressed what happens to the application; including waiting for a seat to be selected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmdChangeSeat_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedPassenger != null)
+
+            try
             {
-                selectedPassenger.SeatNumber = null;
-                lblPassengersSeatNumber.Content = " ";
-                setSeatColors();
-                cbChoosePassenger.IsEnabled = false;
-                cbChooseFlight.IsEnabled = false;
-                editPassenger = true;
+                if (selectedPassenger != null)
+                {
+                    selectedPassenger.SeatNumber = null;
+                    lblPassengersSeatNumber.Content = " ";
+                    setSeatColors();
+                    cbChoosePassenger.IsEnabled = false;
+                    cbChooseFlight.IsEnabled = false;
+                    editPassenger = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError(MethodInfo.GetCurrentMethod().DeclaringType.Name,
+                    MethodInfo.GetCurrentMethod().Name, ex.Message);
             }
         }
 
 
 
-
+        /// <summary>
+        /// exception handler that shows the error
+        /// </summary>
+        /// <param name="sClass">the class</param>
+        /// <param name="sMethod">the method</param>
+        /// <param name="sMessage">the error message</param>
         private void HandleError(string sClass, string sMethod, string sMessage)
         {
             try

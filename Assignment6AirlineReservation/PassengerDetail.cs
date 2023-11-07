@@ -9,9 +9,9 @@ namespace Assignment6AirlineReservation
     class PassengerDetail
     {
         /// <summary>
-        /// The planeId of the passengers from the database
+        /// The passengerId of the passengers from the database
         /// </summary>
-        private int id;
+        private readonly int passengerId;
         /// <summary>
         /// The first name of the passengers
         /// </summary>
@@ -33,12 +33,12 @@ namespace Assignment6AirlineReservation
         /// <param name="lastName">The last name of the passengers</param>
         /// <param name="seatNumber">Optionally the seat number of the passengers</param>
         /// <exception cref="Exception"></exception>
-        public PassengerDetail(int id, string firstName, string lastName, int? seatNumber = null)
+        public PassengerDetail(int passengerId, string firstName, string lastName, int? seatNumber = null)
         {
 
             try
             {
-                this.id = id;
+                this.passengerId = passengerId;
                 this.firstName = firstName;
                 this.lastName = lastName;
                 this.seatNumber = seatNumber;
@@ -50,7 +50,7 @@ namespace Assignment6AirlineReservation
             }
         }
         /// <summary>
-        /// Returns the seat number of the passengers
+        /// Returns the seat number of the passengers. Or sets the seat to any given number.
         /// </summary>
         public int? SeatNumber
         {
@@ -66,24 +66,47 @@ namespace Assignment6AirlineReservation
 
                 }
             }
-            set { seatNumber = value; }
-        }
-        public int Id
-        {
-            get
+            set
             {
-                return id;
+                try
+                {
+                    seatNumber = value;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+
+                }
             }
         }
 
         /// <summary>
-        /// Overrides the ToString method to get the name
+        /// Returns the passengerId of the passenger
+        /// </summary>
+        public int Id
+        {
+            get
+            {
+
+                try
+                {
+                    return passengerId;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Overrides the ToString method to get the name. Used in the combo-box
         /// </summary>
         /// <returns>"firstName lastName" format string</returns>
         /// <exception cref="Exception"></exception>
         public override string ToString()
         {
-
             try
             {
                 return firstName + " " + lastName;
@@ -95,5 +118,6 @@ namespace Assignment6AirlineReservation
             }
         }
 
+        
     }
 }

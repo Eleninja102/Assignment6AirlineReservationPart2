@@ -13,16 +13,9 @@ namespace Assignment6AirlineReservation
     {
 
         /// <summary>
-        /// The list of planes as a PlaneDetail
+        /// The BingingList of planes as a PlaneDetail
         /// </summary>
         private static BindingList<PlaneDetail> planes = new BindingList<PlaneDetail>();
-
-        private static PassengerDetail newPassenger;
-
-        public static PassengerDetail NewPassenger
-        {
-            get { return newPassenger; }
-        }
 
         /// <summary>
         /// Adds the sql info to the planes list and adds all the passengers to the list.
@@ -71,55 +64,125 @@ namespace Assignment6AirlineReservation
             }
         }
 
-
+        /// <summary>
+        /// Returns the list of plane objects as a bindingList. Technically could be a list as we never add planes but works
+        /// </summary>
         public static BindingList<PlaneDetail> Planes
         {
             get
             {
-                return planes;
+
+                try
+                {
+                    return planes;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+
+                }
             }
         }
 
+        /// <summary>
+        /// Adds the passenger to the given database
+        /// </summary>
+        /// <param name="FirstName">The first name</param>
+        /// <param name="LastName">The last name</param>
+        /// <returns>A passenger object with the newly given Id</returns>
+        /// <exception cref="Exception"></exception>
         public static PassengerDetail addPassenger(string FirstName, string LastName)
         {
-            string sSQL = $"INSERT INTO PASSENGER(First_Name, Last_Name) VALUES('{FirstName}','{LastName}')";
-            clsDataAccess.ExecuteNonQuery(sSQL);
-            sSQL = $"SELECT Passenger_ID from Passenger where First_Name = '{FirstName}' AND Last_Name = '{LastName}'";
-            string id = clsDataAccess.ExecuteScalarSQL(sSQL);
-            bool res = int.TryParse(id, out int passengerId);
-            return new PassengerDetail(passengerId, FirstName, LastName);
+
+            try
+            {
+                string sSQL = $"INSERT INTO PASSENGER(First_Name, Last_Name) VALUES('{FirstName}','{LastName}')";
+                clsDataAccess.ExecuteNonQuery(sSQL);
+                sSQL = $"SELECT Passenger_ID from Passenger where First_Name = '{FirstName}' AND Last_Name = '{LastName}'";
+                string id = clsDataAccess.ExecuteScalarSQL(sSQL);
+                bool res = int.TryParse(id, out int passengerId);
+                return new PassengerDetail(passengerId, FirstName, LastName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+
+            }
         }
 
-
+        /// <summary>
+        /// Deletes the passenger
+        /// </summary>
+        /// <param name="flightId">The flightId the passenger is on</param>
+        /// <param name="passengerId">The passengerId of the flight</param>
+        /// <exception cref="Exception"></exception>
         public static void deletePassenger(int flightId, int passengerId)
         {
-            deletePassengerLink(flightId, passengerId);
 
-            string sSQL = $"Delete FROM PASSENGER WHERE PASSENGER_ID = {passengerId}";
-            clsDataAccess.ExecuteNonQuery(sSQL);
-
-        }
-
-        public static void deletePassengerLink(int flightId, int passengerId)
-        {
-           string sSQL = "Delete FROM FLIGHT_PASSENGER_LINK " + $"WHERE FLIGHT_ID = {flightId} AND " + $"PASSENGER_ID = {passengerId}";
-
-            clsDataAccess.ExecuteNonQuery(sSQL);
-        }
-
-        public static void changeSeatPassenger(int flightId, int seatNumber, int passengerId)
-        {
-            try { 
-                deletePassengerLink(flightId, passengerId);
-            }
-            finally
+            try
             {
+                deletePassengerLink(flightId, passengerId);
 
-                string sSQL = "INSERT INTO Flight_Passenger_Link(Flight_ID, Passenger_ID, Seat_Number) " +
-                $"VALUES( {flightId} , {passengerId} , {seatNumber})";
+                string sSQL = $"Delete FROM PASSENGER WHERE PASSENGER_ID = {passengerId}";
                 clsDataAccess.ExecuteNonQuery(sSQL);
             }
-        
+            catch (Exception ex)
+            {
+                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+
+            }
+
+        }
+        /// <summary>
+        /// Deletes the link between a passenger and a flight needs to be run before deleting a passenger
+        /// </summary>
+        /// <param name="flightId">The flightId of the given flight</param>
+        /// <param name="passengerId">The passengerId of the passenger</param>
+        /// <exception cref="Exception"></exception>
+        public static void deletePassengerLink(int flightId, int passengerId)
+        {
+
+            try
+            {
+                string sSQL = "Delete FROM FLIGHT_PASSENGER_LINK " + $"WHERE FLIGHT_ID = {flightId} AND " + $"PASSENGER_ID = {passengerId}";
+
+                clsDataAccess.ExecuteNonQuery(sSQL);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+
+            }
+        }
+
+        /// <summary>
+        /// Given a the data it deletes the old connection and creates a new one
+        /// </summary>
+        /// <param name="flightId"></param>
+        /// <param name="seatNumber"></param>
+        /// <param name="passengerId"></param>
+        /// <exception cref="Exception"></exception>
+        public static void changeSeatPassenger(int flightId, int seatNumber, int passengerId)
+        {
+            try
+            {
+                try
+                {
+                    deletePassengerLink(flightId, passengerId);
+                }
+                finally
+                {
+
+                    string sSQL = "INSERT INTO Flight_Passenger_Link(Flight_ID, Passenger_ID, Seat_Number) " +
+                    $"VALUES( {flightId} , {passengerId} , {seatNumber})";
+                    clsDataAccess.ExecuteNonQuery(sSQL);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(MethodInfo.GetCurrentMethod().DeclaringType.Name + "." + MethodInfo.GetCurrentMethod().Name + " -> " + ex.Message);
+
+            }
         }
     }
 }
