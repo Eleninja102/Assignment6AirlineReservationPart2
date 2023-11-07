@@ -163,7 +163,6 @@ namespace Assignment6AirlineReservation
             {
                 Label labelSender = sender as Label;
                 string selectedNum = labelSender.Content.ToString();
-                lblPassengersSeatNumber.Content = selectedNum;
                 bool res = int.TryParse(selectedNum, out int num);
                 if (editPassenger)
                 {
@@ -172,17 +171,24 @@ namespace Assignment6AirlineReservation
                         cbChoosePassenger.IsEnabled = true;
                         cbChooseFlight.IsEnabled = true;
                     }
+                    else
+                    {
+                        return;
+                    }
                 }
                 else
                 {
                     cbChoosePassenger.SelectedItem = selectedPlane.getPassenger(selectedNum);
                 }
+                lblPassengersSeatNumber.Content = selectedNum;
+
 
                 if (selectedPassenger == null || editPassenger)
                 {
                     setSeatColors();
                 }
                 editPassenger = false;
+
 
             }
             catch (Exception ex)
@@ -267,7 +273,9 @@ namespace Assignment6AirlineReservation
             {
                 if (selectedPassenger != null)
                 {
+                    lblPassengersSeatNumber.Content = " ";
                     selectedPlane.deletePassenger(selectedPassenger);
+                    setSeatColors();
                 }
             }
             catch (Exception ex)
